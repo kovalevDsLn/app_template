@@ -1,0 +1,24 @@
+{
+  "name": "app",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Denis Kovalev <kovalev.ds.ln@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/libs/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "normalize-css": "normalize.css#^6.0.0",
+    "tooltipster": "^4.2.3"
+  }
+}
