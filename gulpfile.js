@@ -1,22 +1,22 @@
 "use strict"
 
-var gulp       		 = require('gulp'),
-	gulpConcat 		 = require('gulp-concat'),
-	gulpSass   		 = require('gulp-sass'),
-	gulpAutoprefixer = require('gulp-autoprefixer'),
-	cleanCSS 		 = require('gulp-clean-css'),	
-	bSync    	     = require('browser-sync').create(),
-	unCSS			 = require('gulp-uncss'), // ! удаляет нужные стили
-	uglifyJS         = require('gulp-uglify'),
-	wiredep          = require('wiredep').stream,
-	useref           = require('gulp-useref'),
-	clean            = require('gulp-clean'),
-	sftp			 = require('gulp-sftp'),
-	gulpif           = require('gulp-if');
+var gulp       			 = require('gulp'),
+		gulpConcat 			 = require('gulp-concat'),
+		gulpSass   			 = require('gulp-sass'),
+		gulpAutoprefixer = require('gulp-autoprefixer'),
+		cleanCSS 				 = require('gulp-clean-css'),
+		bSync    	  	   = require('browser-sync').create(),
+		unCSS						 = require('gulp-uncss'), // ! удаляет нужные стили
+		uglifyJS         = require('gulp-uglify'),
+		wiredep          = require('wiredep').stream,
+		useref           = require('gulp-useref'),
+		clean            = require('gulp-clean'),
+		sftp						 = require('gulp-sftp'),
+		gulpif           = require('gulp-if');
 
 
- 
-// CSS 
+
+// CSS
 gulp.task('toCSS', function () {
   return gulp.src('app/sass/*.sass')
     .pipe(gulpSass.sync().on('error', gulpSass.logError)) // from SASS to CSS
@@ -24,7 +24,7 @@ gulp.task('toCSS', function () {
     .pipe(gulpAutoprefixer({  // autoprefixer
             browsers: ['last 10 versions', 'ie 9'],
             cascade: false
-        })) 
+        }))
     .pipe(gulp.dest('app/css'))
     .pipe(bSync.stream());
 })
@@ -33,14 +33,18 @@ gulp.task('toCSS', function () {
 // START WATCH
 gulp.task('default', ['toCSS'], function() {
 
-    bSync.init({
-        server: "./app",
-        notify: false
+		bSync.init({
+        proxy: {
+					target: "template:8080/app" // cлежение за сервером (указать путь)
+				},
+        notify: false,
+				// port: 8080 // по умолчанию 3000
     });
 
-    gulp.watch('app/sass/*.sass', ['toCSS']);
-    gulp.watch('app/js/*.js')
-    gulp.watch("app/*.html").on('change', bSync.reload);
+		gulp.watch('app/sass/*.sass', ['toCSS']);
+    gulp.watch('app/js/*.js').on('change', bSync.reload);
+    gulp.watch("app/**/*.html").on('change', bSync.reload);
+    gulp.watch("app/**/*.php").on('change', bSync.reload);
 });
 
 // WIREDEP добавление библиотек
@@ -60,7 +64,7 @@ gulp.task('build', ['clean'], function () {
         .pipe(useref())
         .pipe(gulpif('*.js', uglifyJS()))
         // .pipe(gulpif('*.css', unCSS({
-        //     html: ['dist/index.html'] 
+        //     html: ['dist/index.html']
         // })))
         .pipe(gulpif('*.css', cleanCSS({compatibility: 'ie9'})))
         .pipe(gulp.dest('dist'));
@@ -72,8 +76,8 @@ gulp.task('clean', function () {
     return gulp.src('dist', {read: false})
         .pipe(clean());
 });
- 
-// Выгрузка на сервер 
+
+// Выгрузка на сервер
 gulp.task('sftp', function () {
     return gulp.src('src/*')
         .pipe(sftp({
